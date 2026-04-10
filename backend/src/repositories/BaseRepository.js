@@ -17,27 +17,30 @@ class BaseRepository {
   /**
    * Find by ID
    */
-  async findById(id, populate = '') {
+  async findById(id, populate = '', lean = true) {
     const query = this.model.findById(id);
     if (populate) query.populate(populate);
+    if (lean) query.lean();
     return query.exec();
   }
 
   /**
    * Find one by filter
    */
-  async findOne(filter, selectFields = '') {
+  async findOne(filter, selectFields = '', lean = true) {
     const query = this.model.findOne(filter);
     if (selectFields) query.select(selectFields);
+    if (lean) query.lean();
     return query.exec();
   }
 
   /**
    * Find all with optional filter
    */
-  async findAll(filter = {}, populate = '') {
+  async findAll(filter = {}, populate = '', lean = true) {
     const query = this.model.find(filter);
     if (populate) query.populate(populate);
+    if (lean) query.lean();
     return query.exec();
   }
 
@@ -77,6 +80,7 @@ class BaseRepository {
       filter = {},
       populate = '',
       select = '',
+      lean = true,
     } = options;
 
     const skip = (page - 1) * limit;
@@ -91,6 +95,7 @@ class BaseRepository {
 
     if (populate) query = query.populate(populate);
     if (select) query = query.select(select);
+    if (lean) query = query.lean();
 
     const data = await query.exec();
 

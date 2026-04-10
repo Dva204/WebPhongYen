@@ -4,6 +4,7 @@
  */
 const BaseRepository = require('./BaseRepository');
 const Product = require('../models/Product');
+const { cache } = require('../configs/redis');
 
 class ProductRepository extends BaseRepository {
   constructor() {
@@ -19,7 +20,11 @@ class ProductRepository extends BaseRepository {
       isActive: true,
       ...options.filter,
     };
-    return this.paginate({ ...options, filter });
+    return this.paginate({ 
+      ...options, 
+      filter,
+      select: 'name price image rating category description'
+    });
   }
 
   /**
@@ -34,10 +39,47 @@ class ProductRepository extends BaseRepository {
    * Get featured products
    */
   async findFeatured(limit = 8) {
-    return Product.find({ isFeatured: true, isActive: true })
+    const cacheKey = `products:featured:${limit}`;
+    const cached = await cache.get(cacheKey);
+    if (cached) return cached;
+
+    const products = await Product.find({ isFeatured: true, isActive: true })
       .populate('category', 'name slug icon')
+      .select('name price item description image rating category isFeatured')
       .sort('-createdAt')
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    if (products) {
+      await cache.set(cacheKey, products, 3600); // Cache for 1 hour
+    }
+    return products;
+  }
+
+  /**
+   * Clear product caches
+   */
+  async clearCache() {
+    await cache.delPattern('products:*');
+  }
+
+  // Override update methods to clear cache
+  async create(data) {
+    const product = await super.create(data);
+    await this.clearCache();
+    return product;
+  }
+
+  async updateById(id, data) {
+    const product = await super.updateById(id, data);
+    await this.clearCache();
+    return product;
+  }
+
+  async deleteById(id) {
+    const result = await super.deleteById(id);
+    await this.clearCache();
+    return result;
   }
 
   /**
@@ -66,6 +108,7 @@ class ProductRepository extends BaseRepository {
       ...options,
       filter: query,
       populate: 'category',
+      select: 'name price image rating category description isFeatured stock',
     });
   }
 

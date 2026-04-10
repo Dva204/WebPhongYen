@@ -43,7 +43,7 @@ export default function HomePage() {
   return (
     <div>
       {/* ==================== HERO ==================== */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-[72px]">
         {/* Background effects */}
         <div className="absolute inset-0 bg-[var(--gradient-hero)]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-[var(--color-primary)] rounded-full blur-[150px] opacity-20 animate-pulse-slow" />
@@ -221,7 +221,7 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
             {loading
               ? Array(8).fill(0).map((_, i) => <ProductSkeleton key={i} />)
               : featured.map((product, i) => (

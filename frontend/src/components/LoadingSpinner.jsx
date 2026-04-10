@@ -36,12 +36,12 @@ export function ProductSkeleton() {
   return (
     <div className="card">
       <div className="aspect-[4/3] skeleton" />
-      <div className="p-4 space-y-3">
-        <div className="h-5 skeleton w-3/4" />
-        <div className="h-4 skeleton w-full" />
-        <div className="flex justify-between items-center">
-          <div className="h-7 skeleton w-20" />
-          <div className="h-10 w-10 skeleton rounded-xl" />
+      <div className="p-3 md:p-4 space-y-2 md:space-y-3">
+        <div className="h-4 md:h-5 skeleton w-3/4" />
+        <div className="h-3 md:h-4 skeleton w-full" />
+        <div className="flex justify-between items-center gap-2">
+          <div className="h-6 md:h-7 skeleton w-16 md:w-20" />
+          <div className="h-8 w-8 md:h-10 md:w-10 skeleton rounded-lg md:rounded-xl" />
         </div>
       </div>
     </div>

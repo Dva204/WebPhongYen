@@ -1,4 +1,4 @@
-# 🍔 FastFood Pro
+# 🍔 WebSite bán đồ ăn nhanh nhà Phong Yến
 
 Production-ready fast food ordering system with React + Node.js + MongoDB + Redis.
 
@@ -58,8 +58,8 @@ npm run dev             # Start on port 5173
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@fastfoodpro.com | admin123 |
-| User | john@example.com | password123 |
+| Admin | admin@gmail.com | admin123 |
+| User | phong@gmail.com | password123 |
 
 ## Docker Deployment
 

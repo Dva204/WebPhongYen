@@ -90,7 +90,7 @@ export default function MenuPage() {
           className="mb-8"
         >
           <h1 className="section-title">Thực đơn <span className="gradient-text">Của Chúng Tôi</span></h1>
-          <p className="section-subtitle !mb-0">Khám phá danh sách đồ ăn nhanh ngon miệng</p>
+          <p className="section-subtitle !mb-0">Khám phá danh sách món ăn ngon miệng</p>
         </motion.div>
 
         {/* Search & Filter Bar */}
@@ -152,9 +152,8 @@ export default function MenuPage() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => { setSelectedCategory(''); setPage(1); }}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                      !selectedCategory ? 'bg-[var(--color-primary)] text-white' : 'bg-white/5 hover:bg-white/10'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${!selectedCategory ? 'bg-[var(--color-primary)] text-white' : 'bg-white/5 hover:bg-white/10'
+                      }`}
                   >
                     Tất cả
                   </button>
@@ -162,9 +161,8 @@ export default function MenuPage() {
                     <button
                       key={cat._id}
                       onClick={() => { setSelectedCategory(cat._id); setPage(1); }}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                        selectedCategory === cat._id ? 'bg-[var(--color-primary)] text-white' : 'bg-white/5 hover:bg-white/10'
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${selectedCategory === cat._id ? 'bg-[var(--color-primary)] text-white' : 'bg-white/5 hover:bg-white/10'
+                        }`}
                     >
                       {cat.icon} {cat.name}
                     </button>
@@ -206,9 +204,8 @@ export default function MenuPage() {
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
           <button
             onClick={() => { setSelectedCategory(''); setPage(1); }}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-              !selectedCategory ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'bg-white/5 hover:bg-white/10'
-            }`}
+            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${!selectedCategory ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'bg-white/5 hover:bg-white/10'
+              }`}
           >
             🍽️ Tất cả món
           </button>
@@ -216,9 +213,8 @@ export default function MenuPage() {
             <button
               key={cat._id}
               onClick={() => { setSelectedCategory(cat._id); setPage(1); }}
-              className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                selectedCategory === cat._id ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'bg-white/5 hover:bg-white/10'
-              }`}
+              className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat._id ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'bg-white/5 hover:bg-white/10'
+                }`}
             >
               {cat.icon} {cat.name}
             </button>
@@ -227,7 +223,7 @@ export default function MenuPage() {
 
         {/* Products Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
             {Array(12).fill(0).map((_, i) => <ProductSkeleton key={i} />)}
           </div>
         ) : products.length === 0 ? (
@@ -239,7 +235,7 @@ export default function MenuPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {products.map((product, i) => (
                 <ProductCard key={product._id} product={product} index={i} />
               ))}
@@ -259,11 +255,10 @@ export default function MenuPage() {
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={`w-10 h-10 rounded-xl font-medium transition-all ${
-                      p === pagination.currentPage
+                    className={`w-10 h-10 rounded-xl font-medium transition-all ${p === pagination.currentPage
                         ? 'bg-[var(--color-primary)] text-white'
                         : 'bg-white/5 hover:bg-white/10'
-                    }`}
+                      }`}
                   >
                     {p}
                   </button>
