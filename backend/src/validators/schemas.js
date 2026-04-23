@@ -109,6 +109,32 @@ const paginationSchema = Joi.object({
   endDate: Joi.date().optional(),
 });
 
+// ==================== CART ====================
+const addToCartSchema = Joi.object({
+  productId: Joi.string().hex().length(24).required()
+    .messages({ 'string.length': 'Invalid product ID', 'any.required': 'productId is required' }),
+  quantity: Joi.number().integer().min(1).max(50).default(1),
+});
+
+const updateCartItemSchema = Joi.object({
+  quantity: Joi.number().integer().min(1).max(50).required()
+    .messages({ 'any.required': 'quantity is required' }),
+});
+
+// ==================== REVIEWS ====================
+const createReviewSchema = Joi.object({
+  productId: Joi.string().hex().length(24).required()
+    .messages({ 'any.required': 'productId is required' }),
+  rating: Joi.number().integer().min(1).max(5).required()
+    .messages({ 'any.required': 'rating is required', 'number.min': 'Rating must be 1–5', 'number.max': 'Rating must be 1–5' }),
+  comment: Joi.string().trim().max(500).allow('').optional(),
+});
+
+const updateReviewSchema = Joi.object({
+  rating: Joi.number().integer().min(1).max(5).optional(),
+  comment: Joi.string().trim().max(500).allow('').optional(),
+}).min(1);
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -119,4 +145,8 @@ module.exports = {
   updateOrderStatusSchema,
   createCategorySchema,
   paginationSchema,
+  addToCartSchema,
+  updateCartItemSchema,
+  createReviewSchema,
+  updateReviewSchema,
 };

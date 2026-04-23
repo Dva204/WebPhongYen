@@ -9,6 +9,7 @@ import { productAPI } from '../services/api';
 import useCartStore from '../store/cartStore';
 import { PageLoader } from '../components/LoadingSpinner';
 import { formatPrice } from '../utils/formatPrice';
+import ReviewSection from '../components/ReviewSection';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -92,6 +93,9 @@ export default function ProductDetailPage() {
                 <span className="text-sm text-[var(--color-text-muted)]">
                   {product.rating.average} ({product.rating.count} đánh giá)
                 </span>
+                <a href="#reviews" className="text-xs text-[var(--color-primary)] hover:underline ml-1">
+                  Xem tất cả
+                </a>
               </div>
             )}
 
@@ -168,6 +172,10 @@ export default function ProductDetailPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* ── Review Section ── */}
+        <ReviewSection productId={id} />
+
       </div>
     </div>
   );

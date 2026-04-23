@@ -6,6 +6,12 @@ import { create } from 'zustand';
 import { authAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
+// Lazy import to avoid circular dependency
+const syncCart = async () => {
+  const { default: useCartStore } = await import('./cartStore');
+  useCartStore.getState().fetchCart();
+};
+
 const useAuthStore = create((set, get) => ({
   user: null,
   isAuthenticated: false,
@@ -28,6 +34,7 @@ const useAuthStore = create((set, get) => ({
         isAdmin: data.data.user.role === 'admin',
         isLoading: false,
       });
+      syncCart(); // Load backend cart silently
     } catch {
       localStorage.removeItem('accessToken');
       set({ user: null, isAuthenticated: false, isAdmin: false, isLoading: false });
@@ -63,10 +70,11 @@ const useAuthStore = create((set, get) => ({
         isAuthenticated: true,
         isAdmin: data.data.user.role === 'admin',
       });
-      toast.success(`Welcome back, ${data.data.user.name}! 👋`);
+      toast.success(`Chào mừng trở lại, ${data.data.user.name}! 👋`);
+      syncCart(); // Sync backend cart
       return true;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Login failed';
+      const msg = error.response?.data?.message || 'Đăng nhập thất bại';
       toast.error(msg);
       return false;
     }

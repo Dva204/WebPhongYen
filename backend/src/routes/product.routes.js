@@ -4,6 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/ProductController');
+const reviewController = require('../controllers/ReviewController');
 const { authenticate, authorize } = require('../middlewares/auth.middleware');
 const validate = require('../middlewares/validate.middleware');
 const { createProductSchema, updateProductSchema, paginationSchema } = require('../validators/schemas');
@@ -13,6 +14,9 @@ const { uploadSingle } = require('../middlewares/upload.middleware');
 router.get('/', validate(paginationSchema, 'query'), productController.getProducts);
 router.get('/featured', productController.getFeatured);
 router.get('/:id', productController.getProduct);
+
+// Reviews sub-route (public - no auth required to read)
+router.get('/:id/reviews', reviewController.getProductReviews);
 
 // Admin routes
 router.post('/',

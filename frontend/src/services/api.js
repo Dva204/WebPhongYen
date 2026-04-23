@@ -131,4 +131,20 @@ export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
 };
 
+export const cartAPI = {
+  getCart: () => api.get('/cart'),
+  addItem: (productId, quantity = 1) => api.post('/cart', { productId, quantity }),
+  updateItem: (productId, quantity) => api.put(`/cart/${productId}`, { quantity }),
+  removeItem: (productId) => api.delete(`/cart/${productId}`),
+  clearCart: () => api.delete('/cart'),
+};
+
+export const reviewAPI = {
+  getProductReviews: (productId, params) =>
+    api.get(`/products/${productId}/reviews`, { params }),
+  createReview: (data) => api.post('/reviews', data),
+  updateReview: (id, data) => api.put(`/reviews/${id}`, data),
+  deleteReview: (id) => api.delete(`/reviews/${id}`),
+};
+
 export default api;

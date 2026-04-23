@@ -1,221 +1,111 @@
-# 🍔 WebSite bán đồ ăn nhanh nhà Phong Yến
+# 🍔 FastFood Pro - Website Bán Đồ Ăn Nhanh Nhà Phong Yến
 
-Production-ready fast food ordering system with React + Node.js + MongoDB + Redis.
+Hệ thống đặt hàng đồ ăn nhanh hiện đại, sẵn sàng cho môi trường Production, được xây dựng bằng React 18 + Node.js (Express) + MongoDB + Redis.
 
-## Tech Stack
+## 🚀 Tính năng nổi bật
+
+- **Auth**: JWT Access + Refresh Token (HttpOnly cookies), phân quyền Admin/User.
+- **Sản phẩm**: Tìm kiếm full-text, lọc theo danh mục, giá cả và gắn thẻ sản phẩm.
+- **Giỏ hàng**: Quản lý giỏ hàng real-time, lưu trữ đồng bộ trong Database.
+- **Đánh giá (Review)**: Hệ thống đánh giá sao và bình luận, tự động cập nhật Rating trung bình cho sản phẩm.
+- **Đặt hàng**: Quy trình đặt hàng chuyên nghiệp, xử lý đơn hàng bất đồng bộ với BullMQ.
+- **Real-time**: Thông báo trạng thái đơn hàng tức thì qua Socket.io.
+- **UI/UX**: Giao diện Premium (Glassmorphism), thiết kế responsive, hiệu ứng mượt mà với Framer Motion.
+
+## 🛠 Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 + Vite, Zustand, TailwindCSS v4, React Router v6, Axios, Framer Motion |
-| Backend | Node.js + Express, JWT Auth, Joi Validation, Socket.io |
-| Database | MongoDB + Mongoose |
-| Cache | Redis (ioredis) |
-| Queue | BullMQ |
-| Storage | Cloudinary (optional, local fallback) |
-| DevOps | Docker, docker-compose, Nginx |
+| **Frontend** | React 18 (Vite), Zustand, TailwindCSS v4, Framer Motion, Axios |
+| **Backend** | Node.js + Express, JWT, Joi Validation, Socket.io |
+| **Database** | MongoDB + Mongoose |
+| **Cache** | Redis (ioredis) |
+| **Queue** | BullMQ |
+| **DevOps** | Docker, Nginx, Winston Logging |
 
-## Architecture
+---
 
-```
-Controller → Service → Repository → Model (MongoDB)
-                ↓
-           Redis Cache
-                ↓
-           BullMQ Jobs → Email / WebSocket
-```
-
-## Quick Start (Development)
-
-### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Redis (optional - graceful fallback)
+## 🏃 Chạy dự án (Development)
 
 ### 1. Backend
-
 ```bash
 cd backend
 npm install
-cp .env.example .env    # Edit .env if needed
-npm run seed            # Seed sample data
-npm run dev             # Start on port 5000
+cp .env.example .env    # Chỉnh sửa MONGODB_URI & REDIS_URL nếu cần
+npm run seed            # Khởi tạo dữ liệu mẫu
+npm run dev             # Chạy tại http://localhost:5000
 ```
 
 ### 2. Frontend
-
 ```bash
 cd frontend
 npm install
-npm run dev             # Start on port 5173
+npm run dev             # Chạy tại http://localhost:5173
 ```
 
-### 3. Open Browser
+### 🔑 Tài khoản dùng thử (Demo)
 
-- Frontend: http://localhost:5173
-- API: http://localhost:5000/api/health
-
-### Demo Accounts
-
-| Role | Email | Password |
+| Vai trò | Email | Mật khẩu |
 |------|-------|----------|
-| Admin | admin@gmail.com | admin123 |
-| User | phong@gmail.com | password123 |
+| **Admin** | `admin@fastfoodpro.com` | `admin123` |
+| **User** | `john@example.com` | `password123` |
 
-## Docker Deployment
+---
 
-```bash
-# Start all services
-docker-compose up -d --build
+## 🔗 Danh sách API chính
 
-# Seed database
-docker-compose exec backend node src/seeds/seed.js
+### 🛒 Giỏ hàng (Cart) - *Yêu cầu đăng nhập*
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/api/cart` | Lấy giỏ hàng của người dùng |
+| POST | `/api/cart` | Thêm sản phẩm vào giỏ hàng |
+| PUT | `/api/cart/:productId` | Cập nhật số lượng sản phẩm |
+| DELETE | `/api/cart/:productId` | Xoá sản phẩm khỏi giỏ hàng |
+| DELETE | `/api/cart` | Làm trống giỏ hàng |
 
-# Access at http://localhost
-```
+### ⭐ Đánh giá (Reviews)
+| Method | Endpoint | Auth | Mô tả |
+|--------|----------|------|-------|
+| GET | `/api/products/:id/reviews` | No | Xem danh sách đánh giá của sản phẩm |
+| POST | `/api/reviews` | Yes | Gửi đánh giá mới (1-5 sao) |
+| PUT | `/api/reviews/:id` | Yes | Chỉnh sửa đánh giá cá nhân |
+| DELETE | `/api/reviews/:id` | Yes | Xoá đánh giá cá nhân |
 
-## API Endpoints
+### 📦 Đơn hàng (Orders)
+| Method | Endpoint | Auth | Mô tả |
+|--------|----------|------|-------|
+| POST | `/api/orders` | User | Đặt hàng từ giỏ hàng |
+| GET | `/api/orders` | User | Lịch sử đơn hàng cá nhân |
+| GET | `/api/orders/admin/all` | Admin | Quản lý toàn bộ đơn hàng (Admin) |
 
-### Auth
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | /api/auth/register | No | Register |
-| POST | /api/auth/login | No | Login |
-| POST | /api/auth/logout | Yes | Logout |
-| POST | /api/auth/refresh | No | Refresh token |
-| GET | /api/auth/me | Yes | Get profile |
+---
 
-### Products
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | /api/products | No | List (paginated, filterable) |
-| GET | /api/products/featured | No | Featured products |
-| GET | /api/products/:id | No | Product detail |
-| POST | /api/products | Admin | Create product |
-| PUT | /api/products/:id | Admin | Update product |
-| DELETE | /api/products/:id | Admin | Delete product |
-
-### Orders
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | /api/orders | User | Create order |
-| GET | /api/orders | User | My orders |
-| GET | /api/orders/:id | User | Order detail |
-| GET | /api/orders/admin/all | Admin | All orders |
-| PUT | /api/orders/:id/status | Admin | Update status |
-
-### Categories
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | /api/categories | No | List categories |
-| POST | /api/categories | Admin | Create category |
-
-### Admin
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | /api/admin/dashboard | Admin | Dashboard stats |
-
-## API Examples (cURL)
-
-### Register
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test User","email":"test@example.com","password":"password123"}'
-```
-
-### Login
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@fastfoodpro.com","password":"admin123"}'
-```
-
-### Get Products
-```bash
-curl http://localhost:5000/api/products?page=1&limit=12&sort=-createdAt
-
-# With category filter
-curl "http://localhost:5000/api/products?category=CATEGORY_ID"
-
-# With search
-curl "http://localhost:5000/api/products?search=burger"
-
-# With price range
-curl "http://localhost:5000/api/products?minPrice=5&maxPrice=15"
-```
-
-### Create Order
-```bash
-curl -X POST http://localhost:5000/api/orders \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -d '{
-    "items": [{"productId":"PRODUCT_ID","quantity":2}],
-    "shippingAddress": {"street":"123 Main St","city":"NYC"},
-    "paymentMethod": "cash"
-  }'
-```
-
-## Folder Structure
+## 📂 Kiến trúc Thư mục
 
 ```
 fastfood-pro/
-├── backend/
-│   └── src/
-│       ├── configs/        # DB, Redis, Cloudinary, env
-│       ├── controllers/    # HTTP request handlers
-│       ├── services/       # Business logic
-│       ├── repositories/   # Data access layer
-│       ├── models/         # Mongoose schemas
-│       ├── routes/         # Express routes
-│       ├── middlewares/     # Auth, error, rate-limit
-│       ├── validators/     # Joi schemas
-│       ├── utils/          # Helpers
-│       ├── jobs/           # BullMQ workers
-│       ├── sockets/        # Socket.io handlers
-│       ├── seeds/          # Sample data
-│       ├── app.js          # Express setup
-│       └── server.js       # Entry point
-├── frontend/
-│   └── src/
-│       ├── components/     # Reusable UI
-│       ├── pages/          # Page components
-│       │   └── admin/      # Admin pages
-│       ├── store/          # Zustand stores
-│       ├── services/       # API layer
-│       └── App.jsx         # Main app with routing
-├── nginx/                  # Nginx reverse proxy
-├── docker-compose.yml
-└── README.md
+├── backend/src/
+│   ├── controllers/    # Xử lý HTTP Request (CartController, ReviewController...)
+│   ├── services/       # Business Logic & Recalculate Ratings
+│   ├── repositories/   # Truy vấn Database (ReviewRepository...)
+│   ├── models/         # Mongoose Schemas (Cart, Review, User...)
+│   ├── routes/         # Khai báo API endpoints
+│   ├── jobs/           # BullMQ Workers (Xử lý đơn hàng ngầm)
+│   └── sockets/        # Real-time event handlers
+├── frontend/src/
+│   ├── components/     # UI Reusable (StarRating, ReviewSection...)
+│   ├── store/          # Quản lý State (AuthStore, ShopStore...)
+│   └── services/       # Tầng gọi API (api.js)
 ```
 
-## Features
+## 🔐 Bảo mật
+- ✅ Hashing mật khẩu với **Bcrypt**.
+- ✅ Chống injection với **mongoSanitize** & **HPP**.
+- ✅ Bảo mật Header với **Helmet**.
+- ✅ Giới hạn lưu lượng (Rate Limiting).
+- ✅ Validation dữ liệu đầu vào chặt chẽ với **Joi**.
 
-### Security
-- ✅ JWT Access + Refresh Token (HttpOnly cookies)
-- ✅ Password hashing (bcrypt, 12 rounds)
-- ✅ Helmet security headers
-- ✅ CORS configuration
-- ✅ Rate limiting (per-route)
-- ✅ MongoDB sanitization (NoSQL injection prevention)
-- ✅ HPP (HTTP parameter pollution prevention)
-- ✅ Input validation (Joi)
+---
 
-### Performance
-- ✅ Redis caching (products, categories)
-- ✅ Cache invalidation on mutations
-- ✅ MongoDB indexes (text search, compound)
-- ✅ Lazy loading (React code splitting)
-- ✅ Gzip compression
-- ✅ Static asset caching (Nginx)
-
-### Bonus
-- ✅ WebSocket real-time order updates (Socket.io)
-- ✅ Email notifications (Nodemailer + Ethereal dev)
-- ✅ BullMQ async order processing
-- ✅ Structured logging (Winston + Morgan)
-- ✅ Standardized API responses
-
-## License
-
-MIT
+## 📄 License
+Dự án được bảo trì bởi **Phong Yến Shop**. MIT License.
