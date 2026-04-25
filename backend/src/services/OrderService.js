@@ -7,6 +7,8 @@ const productRepository = require('../repositories/ProductRepository');
 const { addOrderJob } = require('../configs/bull');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
+const costService = require('./CostService');
+const Ingredient = require('../models/Ingredient');
 
 class OrderService {
   /**
@@ -41,13 +43,30 @@ class OrderService {
 
       orderItems.push(orderItem);
       totalPrice += product.price * item.quantity;
+
+      // Check ingredient availability
+      if (product.recipe && product.recipe.length > 0) {
+        for (const recipeItem of product.recipe) {
+          const ingredient = await Ingredient.findById(recipeItem.ingredient);
+          const requiredQty = recipeItem.quantity * item.quantity;
+          if (!ingredient || ingredient.stock < requiredQty) {
+            throw AppError.badRequest(`Insufficient ingredients (${ingredient?.name || 'Unknown'}) for ${product.name}`);
+          }
+        }
+      }
     }
+
+    // Calculate costs and profit
+    const totalCost = await costService.calculateOrderCosts(orderItems);
+    const profit = totalPrice - totalCost;
 
     // Create order
     const order = await orderRepository.create({
       user: userId,
       items: orderItems,
       totalPrice,
+      totalCost,
+      profit,
       shippingAddress,
       paymentMethod: paymentMethod || 'cash',
       paymentStatus: paymentMethod === 'cash' ? 'pending' : 'pending',
@@ -55,8 +74,17 @@ class OrderService {
       estimatedDelivery: new Date(Date.now() + 45 * 60 * 1000), // 45 min
     });
 
-    // Decrease stock
-    await productRepository.decreaseStock(orderItems);
+    // Decrease INGREDIENT stock instead of PRODUCT stock
+    for (const item of orderItems) {
+      const product = await productRepository.findById(item.product);
+      if (product.recipe && product.recipe.length > 0) {
+        for (const recipeItem of product.recipe) {
+          await Ingredient.findByIdAndUpdate(recipeItem.ingredient, {
+            $inc: { stock: -(recipeItem.quantity * item.quantity) }
+          });
+        }
+      }
+    }
 
     // Add async job for email notification, etc.
     await addOrderJob('process-new-order', {
@@ -147,7 +175,7 @@ class OrderService {
       updateData.paymentStatus = 'paid';
     }
 
-    const updatedOrder = await orderRepository.updateById(orderId, updateData);
+    const updatedOrder = await orderRepository.updateStatus(orderId, updateData);
 
     // Add job for status notification
     await addOrderJob('order-status-update', {

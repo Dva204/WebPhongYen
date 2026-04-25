@@ -15,8 +15,11 @@ export default function Footer() {
               <span className="text-3xl">🍔</span>
               <span className="text-xl font-bold gradient-text">Phong Yến Shop</span>
             </div>
-            <p className="text-[var(--color-text-muted)] text-sm leading-relaxed">
+            <p className="text-[var(--color-text-muted)] text-sm leading-relaxed mb-2">
               Thức ăn nhanh cao cấp giao tận cửa. Nguyên liệu tươi ngon, hương vị đậm đà, khó quên.
+            </p>
+            <p className="text-xs text-[var(--color-text-muted)] opacity-80">
+              Đối tác: <span className="text-[var(--color-text-primary)]">DvaGroup</span>
             </p>
           </div>
 

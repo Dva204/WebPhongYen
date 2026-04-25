@@ -19,6 +19,7 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const AdminDashboard = lazy(() => import('./pages/admin/DashboardPage'));
 const AdminProducts = lazy(() => import('./pages/admin/ProductsPage'));
 const AdminOrders = lazy(() => import('./pages/admin/OrdersPage'));
+const AdminIngredients = lazy(() => import('./pages/admin/IngredientsPage'));
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -64,6 +65,7 @@ export default function App() {
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
             <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+            <Route path="/admin/ingredients" element={<AdminRoute><AdminIngredients /></AdminRoute>} />
 
             {/* 404 */}
             <Route path="*" element={

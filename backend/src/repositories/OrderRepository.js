@@ -55,10 +55,10 @@ class OrderRepository extends BaseRepository {
   /**
    * Update order status
    */
-  async updateStatus(orderId, status) {
+  async updateStatus(orderId, updateData) {
     return Order.findByIdAndUpdate(
       orderId,
-      { status },
+      updateData,
       { new: true, runValidators: true }
     ).populate('user', 'name email');
   }

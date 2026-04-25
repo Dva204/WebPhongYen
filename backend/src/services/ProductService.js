@@ -6,6 +6,7 @@ const productRepository = require('../repositories/ProductRepository');
 const { cache } = require('../configs/redis');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
+const Ingredient = require('../models/Ingredient');
 
 // Cache keys
 const CACHE_PREFIX = 'products';
@@ -42,6 +43,11 @@ class ProductService {
       { page: parseInt(page), limit: parseInt(limit), sort }
     );
 
+    // Calculate dynamic stock for each product
+    for (let product of result.data) {
+      product.stock = await this._calculateRecipeStock(product);
+    }
+
     // Cache the result
     await cache.set(cacheKey, result, CACHE_TTL);
 
@@ -59,10 +65,13 @@ class ProductService {
       return cached;
     }
 
-    const product = await productRepository.findById(id, 'category');
+    const product = await productRepository.findById(id, 'category recipe.ingredient');
     if (!product) {
       throw AppError.notFound('Product not found');
     }
+
+    // Calculate dynamic stock
+    product.stock = await this._calculateRecipeStock(product);
 
     await cache.set(cacheKey, product, CACHE_TTL);
     return product;
@@ -127,6 +136,35 @@ class ProductService {
   async _invalidateCache() {
     await cache.delPattern(`${CACHE_PREFIX}:*`);
     logger.debug('Product cache invalidated');
+  }
+
+  /**
+   * Calculates the maximum possible stock for a product based on its recipe and ingredient stocks.
+   */
+  async _calculateRecipeStock(product) {
+    if (!product.recipe || product.recipe.length === 0) {
+      return product.stock || 0; // Fallback to manual stock if no recipe
+    }
+
+    let minStock = Infinity;
+
+    for (const item of product.recipe) {
+      // If recipe is populated, use item.ingredient.stock, else fetch it
+      let ingredientStock = 0;
+      if (item.ingredient && typeof item.ingredient === 'object' && 'stock' in item.ingredient) {
+        ingredientStock = item.ingredient.stock;
+      } else {
+        const ingredient = await Ingredient.findById(item.ingredient);
+        ingredientStock = ingredient ? ingredient.stock : 0;
+      }
+
+      const possibleQty = Math.floor(ingredientStock / item.quantity);
+      if (possibleQty < minStock) {
+        minStock = possibleQty;
+      }
+    }
+
+    return minStock === Infinity ? 0 : minStock;
   }
 }
 

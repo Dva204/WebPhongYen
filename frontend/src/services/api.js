@@ -129,6 +129,15 @@ export const categoryAPI = {
 
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
+  getFinance: () => api.get('/dashboard/finance'),
+};
+
+export const ingredientAPI = {
+  getAll: () => api.get('/ingredients'),
+  create: (data) => api.post('/ingredients', data),
+  update: (id, data) => api.put(`/ingredients/${id}`, data),
+  delete: (id) => api.delete(`/ingredients/${id}`),
+  recordImport: (id, data) => api.post(`/ingredients/${id}/import`, data),
 };
 
 export const cartAPI = {

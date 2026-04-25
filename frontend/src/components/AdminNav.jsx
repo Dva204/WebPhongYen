@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { HiOutlineChartPie, HiOutlineShoppingBag, HiOutlineClipboardList } from 'react-icons/hi';
+import { HiOutlineChartPie, HiOutlineShoppingBag, HiOutlineClipboardList, HiOutlineDatabase } from 'react-icons/hi';
 
 export default function AdminNav() {
   const location = useLocation();
@@ -9,6 +9,7 @@ export default function AdminNav() {
     { to: '/admin', label: 'Tổng Quan', icon: <HiOutlineChartPie className="w-5 h-5" /> },
     { to: '/admin/products', label: 'Sản Phẩm', icon: <HiOutlineShoppingBag className="w-5 h-5" /> },
     { to: '/admin/orders', label: 'Đơn Hàng', icon: <HiOutlineClipboardList className="w-5 h-5" /> },
+    { to: '/admin/ingredients', label: 'Nguyên Liệu', icon: <HiOutlineDatabase className="w-5 h-5" /> },
   ];
 
   return (

@@ -12,6 +12,13 @@ class OrderController {
   async createOrder(req, res, next) {
     try {
       const order = await orderService.createOrder(req.user.id, req.body);
+      
+      // Real-time notification for admin
+      const io = req.app.get('io');
+      if (io) {
+        io.to('admin').emit('order:new', order);
+      }
+
       ApiResponse.created(res, { order }, 'Order placed successfully');
     } catch (error) {
       next(error);
@@ -61,6 +68,21 @@ class OrderController {
   async updateStatus(req, res, next) {
     try {
       const order = await orderService.updateStatus(req.params.id, req.body.status);
+      
+      // Real-time notification
+      const io = req.app.get('io');
+      if (io) {
+        // Notify admin room
+        io.to('admin').emit('order:updated', order);
+        // Notify specific user room
+        io.to(`user:${order.user._id || order.user}`).emit('order:status', {
+          orderId: order._id,
+          status: order.status
+        });
+        // Notify specific order room
+        io.to(`order:${order._id}`).emit('order:refresh', order);
+      }
+
       ApiResponse.success(res, { order }, `Order status updated to ${req.body.status}`);
     } catch (error) {
       next(error);

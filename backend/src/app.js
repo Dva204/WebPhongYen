@@ -25,6 +25,8 @@ const categoryRoutes = require('./routes/category.routes');
 const adminRoutes = require('./routes/admin.routes');
 const cartRoutes = require('./routes/cart.routes');
 const reviewRoutes = require('./routes/review.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
+const ingredientRoutes = require('./routes/ingredient.routes');
 
 const app = express();
 
@@ -96,6 +98,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/ingredients', ingredientRoutes);
 
 // ==================== ERROR HANDLING ====================
 

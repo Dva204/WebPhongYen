@@ -4,13 +4,20 @@ Hệ thống đặt hàng đồ ăn nhanh hiện đại, sẵn sàng cho môi tr
 
 ## 🚀 Tính năng nổi bật
 
+### 💎 Trải nghiệm người dùng
 - **Auth**: JWT Access + Refresh Token (HttpOnly cookies), phân quyền Admin/User.
 - **Sản phẩm**: Tìm kiếm full-text, lọc theo danh mục, giá cả và gắn thẻ sản phẩm.
-- **Giỏ hàng**: Quản lý giỏ hàng real-time, lưu trữ đồng bộ trong Database.
-- **Đánh giá (Review)**: Hệ thống đánh giá sao và bình luận, tự động cập nhật Rating trung bình cho sản phẩm.
-- **Đặt hàng**: Quy trình đặt hàng chuyên nghiệp, xử lý đơn hàng bất đồng bộ với BullMQ.
+- **Giỏ hàng & Đánh giá**: Quản lý giỏ hàng real-time, hệ thống review 5 sao kèm rating trung bình.
 - **Real-time**: Thông báo trạng thái đơn hàng tức thì qua Socket.io.
-- **UI/UX**: Giao diện Premium (Glassmorphism), thiết kế responsive, hiệu ứng mượt mà với Framer Motion.
+- **UI/UX Premium**: Giao diện Glassmorphism hiện đại, hiệu ứng mượt mà với Framer Motion.
+
+### 📊 Quản lý Tài chính & Kho (Mới)
+- **Quản lý Nguyên Liệu**: Theo dõi kho tồn thực tế, đơn vị tính và giá vốn.
+- **Giá Vốn Trung Bình (Weighted Average Cost)**: Tự động tính toán giá vốn khi nhập kho thêm để quản lý chi phí chính xác.
+- **Quản lý Công Thức (Recipe)**: Thiết lập thành phần nguyên liệu cho từng món ăn.
+- **Tồn Kho Động**: Tự động tính toán số lượng sản phẩm có thể bán dựa trên lượng nguyên liệu còn lại trong kho.
+- **Báo Cáo Tài Chính**: Dashboard theo dõi Doanh thu, Chi phí giá vốn (COGS), Lợi nhuận gộp và Tỷ suất lợi nhuận (Margin) theo thời gian thực.
+- **Dự báo Kho**: Cảnh báo khi nguyên liệu sắp hết dựa trên đơn hàng.
 
 ## 🛠 Tech Stack
 
@@ -20,7 +27,7 @@ Hệ thống đặt hàng đồ ăn nhanh hiện đại, sẵn sàng cho môi tr
 | **Backend** | Node.js + Express, JWT, Joi Validation, Socket.io |
 | **Database** | MongoDB + Mongoose |
 | **Cache** | Redis (ioredis) |
-| **Queue** | BullMQ |
+| **Queue** | BullMQ (Xử lý đơn hàng & Stock jobs) |
 | **DevOps** | Docker, Nginx, Winston Logging |
 
 ---
@@ -32,7 +39,8 @@ Hệ thống đặt hàng đồ ăn nhanh hiện đại, sẵn sàng cho môi tr
 cd backend
 npm install
 cp .env.example .env    # Chỉnh sửa MONGODB_URI & REDIS_URL nếu cần
-npm run seed            # Khởi tạo dữ liệu mẫu
+npm run seed            # Khởi tạo dữ liệu cơ bản
+node src/seeds/ingredient_seed.js # Khởi tạo nguyên liệu & công thức mẫu
 npm run dev             # Chạy tại http://localhost:5000
 ```
 
@@ -52,31 +60,23 @@ npm run dev             # Chạy tại http://localhost:5173
 
 ---
 
-## 🔗 Danh sách API chính
+## 🔗 Danh sách API chính (Mở rộng)
 
-### 🛒 Giỏ hàng (Cart) - *Yêu cầu đăng nhập*
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/cart` | Lấy giỏ hàng của người dùng |
-| POST | `/api/cart` | Thêm sản phẩm vào giỏ hàng |
-| PUT | `/api/cart/:productId` | Cập nhật số lượng sản phẩm |
-| DELETE | `/api/cart/:productId` | Xoá sản phẩm khỏi giỏ hàng |
-| DELETE | `/api/cart` | Làm trống giỏ hàng |
-
-### ⭐ Đánh giá (Reviews)
+### 📊 Dashboard & Tài chính
 | Method | Endpoint | Auth | Mô tả |
 |--------|----------|------|-------|
-| GET | `/api/products/:id/reviews` | No | Xem danh sách đánh giá của sản phẩm |
-| POST | `/api/reviews` | Yes | Gửi đánh giá mới (1-5 sao) |
-| PUT | `/api/reviews/:id` | Yes | Chỉnh sửa đánh giá cá nhân |
-| DELETE | `/api/reviews/:id` | Yes | Xoá đánh giá cá nhân |
+| GET | `/api/admin/dashboard` | Admin | Thống kê tổng quan đơn hàng/doanh thu |
+| GET | `/api/dashboard/finance` | Admin | Báo cáo Doanh thu, COGS, Lợi nhuận |
 
-### 📦 Đơn hàng (Orders)
+### 🌿 Nguyên Liệu (Ingredients)
 | Method | Endpoint | Auth | Mô tả |
 |--------|----------|------|-------|
-| POST | `/api/orders` | User | Đặt hàng từ giỏ hàng |
-| GET | `/api/orders` | User | Lịch sử đơn hàng cá nhân |
-| GET | `/api/orders/admin/all` | Admin | Quản lý toàn bộ đơn hàng (Admin) |
+| GET | `/api/ingredients` | Admin | Danh sách nguyên liệu & tồn kho |
+| POST | `/api/ingredients/:id/import` | Admin | Nhập kho (Tự động tính lại Giá vốn trung bình) |
+| POST/PUT | `/api/ingredients` | Admin | Tạo/Cập nhật nguyên liệu |
+
+### 🛒 Giỏ hàng, Review & Orders (Existing)
+... và các API chuẩn RESTful cho Product, Category và User khác.
 
 ---
 
@@ -85,17 +85,15 @@ npm run dev             # Chạy tại http://localhost:5173
 ```
 fastfood-pro/
 ├── backend/src/
-│   ├── controllers/    # Xử lý HTTP Request (CartController, ReviewController...)
-│   ├── services/       # Business Logic & Recalculate Ratings
-│   ├── repositories/   # Truy vấn Database (ReviewRepository...)
-│   ├── models/         # Mongoose Schemas (Cart, Review, User...)
-│   ├── routes/         # Khai báo API endpoints
-│   ├── jobs/           # BullMQ Workers (Xử lý đơn hàng ngầm)
-│   └── sockets/        # Real-time event handlers
+│   ├── controllers/    # Controller handling (Dashboard, Ingredient, Product...)
+│   ├── services/       # Business Logic (CostService, ProductService, OrderService...)
+│   ├── repositories/   # Data Access Layer
+│   ├── models/         # Mongoose Schemas (Ingredient, IngredientImport, Product, Order...)
+│   └── seeds/          # Scripts khởi tạo dữ liệu mẫu
 ├── frontend/src/
-│   ├── components/     # UI Reusable (StarRating, ReviewSection...)
-│   ├── store/          # Quản lý State (AuthStore, ShopStore...)
-│   └── services/       # Tầng gọi API (api.js)
+│   ├── pages/admin/    # Giao diện quản lý (IngredientsPage, ProductsPage, Dashboard...)
+│   ├── components/     # UI Reusable components
+│   └── services/       # Tầng gọi API (Axios instance)
 ```
 
 ## 🔐 Bảo mật
@@ -107,5 +105,8 @@ fastfood-pro/
 
 ---
 
-## 📄 License
-Dự án được bảo trì bởi **Phong Yến Shop**. MIT License.
+## 📄 Thương hiệu & Đối tác
+Hệ thống được phát triển và vận hành bởi **Phong Yến Shop**.
+**Đối tác chiến lược:** DvaGroup
+
+MIT License.

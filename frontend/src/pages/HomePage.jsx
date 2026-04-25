@@ -9,6 +9,7 @@ import { HiOutlineArrowRight, HiOutlineShoppingCart, HiOutlineClock, HiOutlineTr
 import { productAPI, categoryAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ProductSkeleton } from '../components/LoadingSpinner';
+import ContactSection from '../components/ContactSection';
 
 export default function HomePage() {
   const [featured, setFeatured] = useState([]);
@@ -266,6 +267,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ==================== CONTACT ==================== */}
+      <ContactSection />
     </div>
   );
 }

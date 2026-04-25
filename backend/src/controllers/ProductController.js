@@ -53,7 +53,16 @@ class ProductController {
           ? req.file.path
           : `/uploads/${req.file.filename}`;
       }
-
+      
+      // Parse recipe if it comes as a string (FormData payload)
+      if (typeof req.body.recipe === 'string') {
+        try {
+          req.body.recipe = JSON.parse(req.body.recipe);
+        } catch (e) {
+          req.body.recipe = [];
+        }
+      }
+ 
       const product = await productService.createProduct(req.body);
       ApiResponse.created(res, { product }, 'Product created');
     } catch (error) {
@@ -70,6 +79,15 @@ class ProductController {
         req.body.image = req.file.path && req.file.path.startsWith('http')
           ? req.file.path
           : `/uploads/${req.file.filename}`;
+      }
+
+      // Parse recipe if it comes as a string
+      if (typeof req.body.recipe === 'string') {
+        try {
+          req.body.recipe = JSON.parse(req.body.recipe);
+        } catch (e) {
+          req.body.recipe = [];
+        }
       }
 
       const product = await productService.updateProduct(req.params.id, req.body);
